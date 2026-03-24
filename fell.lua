@@ -3,10 +3,10 @@
 --sequencer/installation/kalimba
 --speed of each note set in time
 --notes play when they cross a pressed key
-time = {73,97,109,137,163,181,199,227,233,211,193,173,151,127,103,83} --primes
-pace = 5 --global tempo. ms per pulse
-note = {77,71,67,64,60,57,48,52,33,47,55,59,62,65,69,72} --midi notes
-length = 4 --sustain time before midi_note_off
+time = {73,97,109,137,163,181,199,227,233,211,193,173,151,127,103,83} --primes, pulses per step
+pace = 5 --global tempo. milleseconds per pulse
+note = {74,71,67,64,60,57,48,52,33,47,55,59,62,65,69,72} --midi notes
+length = 4 --sustain steps before midi_note_off
 lowV = 40 --lowest velocity (velocity randomized for each note)
 highV = 100 --highest velocity
 counter = {}
@@ -46,8 +46,8 @@ function tick()
   grid_refresh()
 end
 
-function grid(x,y,z)
-  print (x,y,z)
+function event_grid(x,y,z)
+  --print (x,y,z)
   if z == 1 then
     seq[x][y] = 1 - seq[x][y] --toggles key/sequence state
     for i=1,16 do --grid lighting code duplicated from above for responsiveness to key press
@@ -72,6 +72,7 @@ for i=1,16 do --initializing the tables
   seq[i][16] = 1
 end
 
-m = metro.new(tick,pace)
+m = metro.init(tick,(pace/1000))
+m:start()
 grid_led_all(0)
 grid_refresh()
