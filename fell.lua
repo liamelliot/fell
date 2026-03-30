@@ -16,9 +16,14 @@ l = {}
 j = {}
 pulse = 1
 
+gridX = grid_size_x() --swap which pair of these lines is commented to change grid orientation
+gridY = grid_size_y() --for 16x8 grids can have 8 notes of 16 steps each or 16 notes of 8 steps each
+--gridX = grid_size_y()
+--gridY = grid_size_x()
+
 function tick()
 
-  for i=1,16 do
+  for i=1,gridX do
     j[i] = pulse%time[i] --checks if pulse is a multiple of time[i]
     if j[i] == 0 then
       if noteOn[i] == true then --countdown to note_off
@@ -29,10 +34,10 @@ function tick()
           l[i] = l[i]-1
         end
       end
-      for k=1,16 do --set grid to match sequence
+      for k=1,gridY do --set grid to match sequence
         grid_led(i,k,(seq[i][k]*5))
       end
-      counter[i]=(counter[i]%16)+1 --step the sequence
+      counter[i]=(counter[i]%gridY)+1 --step the sequence
       grid_led(i,counter[i],15) --light up the playhead
       if seq[i][counter[i]] == 1 then --if this step is active, play a note
         vel = math.random(lowV,highV)
@@ -50,26 +55,26 @@ function event_grid(x,y,z)
   --print (x,y,z)
   if z == 1 then
     seq[x][y] = 1 - seq[x][y] --toggles key/sequence state
-    for i=1,16 do --grid lighting code duplicated from above for responsiveness to key press
+    for i=1,gridX do --grid lighting code duplicated from above for responsiveness to key press
       grid_led((counter[i]),i,0)
-      for k=1,16 do
+      for k=1,gridY do
         grid_led(i,k,(seq[i][k]*5))
       end
-      grid_led(i,counter[i],15)
+      grid_led(i,counter[i],(gridY-1))
     end
     grid_refresh()
   end
 end
 
-for i=1,16 do --initializing the tables
+for i=1,gridX do --initializing the tables
   counter[i] = 1
   noteOn[i] = false
   l[i] = length
   seq[i] = {}
-  for j=1,16 do
+  for j=1,gridY do
     seq[i][j] = 0
   end
-  seq[i][16] = 1
+  seq[i][gridY] = 1
 end
 
 m = metro.init(tick,(pace/1000))
